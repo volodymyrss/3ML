@@ -415,17 +415,23 @@ class Significance(object):
 
     def __init__(self, Non, Noff, alpha=1):
 
+        """
+
+        :param Non: number of counts in the on source interval
+        :param Noff: number of counts in the off source interval
+        :param alpha: ratio of on source and off source intervals
+        """
         assert alpha > 0 and alpha <= 1
 
-        self.Non = np.array(Non, dtype=float, ndmin=1)
+        self._Non = np.array(Non, dtype=float, ndmin=1)
 
-        self.Noff = np.array(Noff, dtype=float, ndmin=1)
+        self._Noff = np.array(Noff, dtype=float, ndmin=1)
 
-        self.alpha = float(alpha)
+        self._alpha = float(alpha)
 
-        self.expected = self.alpha * self.Noff
+        self._expected = self._alpha * self._Noff
 
-        self.net = self.Non - self.expected
+        self._net = self._Non - self._expected
 
     def known_background(self):
         """
@@ -446,7 +452,7 @@ class Significance(object):
 
         # Poisson probability of obtaining Non given Noff * alpha, in sigma units
 
-        poisson_probability = PoissonResiduals(self.Non, self.Noff, self.alpha).significance_one_side()
+        poisson_probability = PoissonResiduals(self._Non, self._Noff, self._alpha).significance_one_side()
 
         return poisson_probability
 
@@ -460,20 +466,20 @@ class Significance(object):
         :return:
         """
 
-        one = np.zeros_like(self.Non, dtype=float)
+        one = np.zeros_like(self._Non, dtype=float)
 
-        idx = self.Non > 0
+        idx = self._Non > 0
 
-        one[idx] = self.Non[idx] * np.log((1 + self.alpha) / self.alpha *
-                                          (self.Non[idx] / (self.Non[idx] + self.Noff[idx])))
+        one[idx] = self._Non[idx] * np.log((1 + self._alpha) / self._alpha *
+                                           (self._Non[idx] / (self._Non[idx] + self._Noff[idx])))
 
-        two = np.zeros_like(self.Noff, dtype=float)
+        two = np.zeros_like(self._Noff, dtype=float)
 
-        two[idx] = self.Noff[idx] * np.log((1 + self.alpha) * (self.Noff[idx] / (self.Non[idx] + self.Noff[idx])))
+        two[idx] = self._Noff[idx] * np.log((1 + self._alpha) * (self._Noff[idx] / (self._Non[idx] + self._Noff[idx])))
 
         if assign_sign:
 
-            sign = np.where(self.net > 0, 1, -1)
+            sign = np.where(self._net > 0, 1, -1)
 
         else:
 
@@ -485,8 +491,8 @@ class Significance(object):
 
         # This is a computation I need to publish (G. Vianello)
 
-        b = self.expected
-        o = self.Non
+        b = self._expected
+        o = self._Non
 
         b0 = 0.5 * (np.sqrt(b ** 2 - 2 * sigma_b ** 2 * (b - 2 * o) + sigma_b ** 4) + b - sigma_b ** 2)
 
