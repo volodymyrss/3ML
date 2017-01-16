@@ -1,4 +1,8 @@
 from threeML.plugins.OGIP.eventlist import EventListWithDeadTime, EventList
+from threeML.plugins.OGIP.pha import PHAII, POISSON_PHAII, BAK_PHAII
+
+
+
 
 import numpy as np
 import pytest
@@ -97,6 +101,7 @@ def test_event_list_constructor():
     assert evt_list._mission == 'UNKNOWN'
 
 
+
 def test_unbinned_fit():
     start, stop = 0, 50
 
@@ -157,3 +162,38 @@ def test_binned_fit():
         assert is_within_tolerance(v, r, relative_tolerance=1.)
 
         ####
+
+
+def test_from_event_list_to_phaII():
+    start, stop = 0, 50
+
+    poly = [1]
+
+    pe = PoissonEventGenerator(poly_coeff=poly)
+
+    arrival_times = pe.non_homogeneous_poisson_generator(start, stop)
+
+    evt_list = EventListWithDeadTime(arrival_times=arrival_times,
+                                     energies=np.zeros_like(arrival_times),
+                                     n_channels=1,
+                                     start_time=arrival_times[0],
+                                     stop_time=arrival_times[-1],
+                                     dead_time=np.zeros_like(arrival_times)
+                                     )
+
+    evt_list.set_polynomial_fit_interval("%f-%f" % (start + 1, stop - 1), unbinned=False)
+    evt_list.set_active_time_intervals("0-1")
+
+
+    phaII = PHAII.from_event_list(event_list=evt_list,use_poly=False)
+
+    assert isinstance(phaII, POISSON_PHAII)
+
+    phaII_bak = PHAII.from_event_list(event_list=evt_list, use_poly=True)
+
+    assert isinstance(phaII_bak, BAK_PHAII)
+
+
+
+
+
