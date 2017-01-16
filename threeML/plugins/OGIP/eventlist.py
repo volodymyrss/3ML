@@ -510,7 +510,7 @@ class EventList(object):
 
             self.set_active_time_intervals(*tmp)
 
-    def get_pha_container(self, use_poly=False):
+    def get_pha_information(self, use_poly=False):
         """
         Return a PHAContainer that can be read by the PHA class
 
@@ -553,17 +553,23 @@ class EventList(object):
             quality = self._native_quality
 
 
-        pha = PHAContainer(rates=rates,
-                           rate_errors=rate_err,
-                           n_channels=self._n_channels,
-                           exposure=self._exposure,
-                           is_poisson=is_poisson,
-                           response_file=self._rsp_file,
-                           mission=self._mission,
-                           instrument=self._instrument,
-                           quality=quality)  # default quality to all good
+        container_dict = {}
 
-        return pha
+        container_dict['instrument'] = self._instrument
+        container_dict['telescope'] = self._mission
+        container_dict['tstart'] = min(self._tmin_list)
+        container_dict['telapse'] = max(self._tmax_list) - min(self._tmin_list)
+        container_dict['channels'] = np.arange(self._n_channels) + self._first_channel
+        container_dict['rate'] = rates
+        container_dict['rate error'] = rate_err
+        container_dict['quality'] = quality
+        container_dict['exposure'] =self._exposure
+        container_dict['response_file'] = self._rsp_file
+
+
+
+
+        return container_dict
 
     def peek(self):
         """

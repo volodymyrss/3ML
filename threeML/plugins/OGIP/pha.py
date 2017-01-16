@@ -1030,6 +1030,9 @@ class POISSON_SPECTRUM(SPECTRUM):
 
         self.hdu.header.set("POISSERR", True)
 
+
+
+
 class BAK_SPECTRUM(SPECTRUM):
 
     def __init__(self, tstart, telapse, channel, rate, quality, grouping, exposure, backscale, respfile,
@@ -1186,6 +1189,46 @@ class PHAII(FITSFile):
 
 
         return spectrum_extension
+
+
+    @classmethod
+    def from_event_list(cls, event_list,use_poly=False):
+
+
+        pha_information = event_list.get_pha_information(use_poly)
+
+
+        if use_poly:
+
+            return BAK_PHAII(instrument_name=pha_information['instrument'],
+                             telescope_name=pha_information['telescope'],
+                             tstart=pha_information['tstart'],
+                             telapse=pha_information['telapse'],
+                             channel=pha_information['channel'],
+                             rate=pha_information['rate'],
+                             stat_err=pha_information['rate error'],
+                             quality=pha_information['quality'],
+                             grouping=None,
+                             exposure=pha_information['exposure'],
+                             backscale=None,
+                             respfile=pha_information['response_file'],
+                             ancrfile=None)
+
+        else:
+
+            return POISSON_PHAII(instrument_name=pha_information['instrument'],
+                                 telescope_name=pha_information['telescope'],
+                                 tstart=pha_information['tstart'],
+                                 telapse=pha_information['telapse'],
+                                 channel=pha_information['channel'],
+                                 rate=pha_information['rate'],
+                                 quality=pha_information['quality'],
+                                 grouping=None,
+                                 exposure=pha_information['exposure'],
+                                 backscale=None,
+                                 respfile=pha_information['response_file'],
+                                 ancrfile=None)
+
 
 class POISSON_PHAII(PHAII):
 
