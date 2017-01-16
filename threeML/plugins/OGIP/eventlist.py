@@ -559,10 +559,12 @@ class EventList(object):
         container_dict['telescope'] = self._mission
         container_dict['tstart'] = min(self._tmin_list)
         container_dict['telapse'] = max(self._tmax_list) - min(self._tmin_list)
-        container_dict['channels'] = np.arange(self._n_channels) + self._first_channel
+        container_dict['channel'] = np.arange(self._n_channels) + self._first_channel
         container_dict['rate'] = rates
         container_dict['rate error'] = rate_err
         container_dict['quality'] = quality
+        # TODO: make sure the grouping makes sense
+        container_dict['grouping'] = np.ones(self._n_channels)
         container_dict['exposure'] =self._exposure
         container_dict['response_file'] = self._rsp_file
 
