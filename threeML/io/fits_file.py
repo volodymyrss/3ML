@@ -1,6 +1,7 @@
 from astropy.io import fits
 import numpy as np
 import astropy.units as u
+import pkg_resources
 
 # From https://heasarc.gsfc.nasa.gov/docs/software/fitsio/c/c_user/node20.html
 # Codes for the data type of binary table columns and/or for the
@@ -113,7 +114,15 @@ class FITSExtension(object):
 
                 # Probe the format
 
+
+
                 format = _NUMPY_TO_FITS_CODE[np.array(test_value.value).dtype.type]
+
+                # check if this is a vector of quantities
+
+                if test_value.shape:
+
+                    format = '%i%s' % (test_value.shape[0], format)
 
                 # Store the unit as text
 
@@ -127,11 +136,15 @@ class FITSExtension(object):
 
                 format = '%iA' % max_string_length
 
+
+
+
             elif np.isscalar(test_value):
 
                 format = _NUMPY_TO_FITS_CODE[np.array(test_value).dtype.type]
 
             elif isinstance(test_value, list) or isinstance(test_value, np.ndarray):
+
 
                 # Probably a column array
                 # Check that we can convert it to a proper numpy type
@@ -157,12 +170,25 @@ class FITSExtension(object):
 
                     raise RuntimeError("Column %s contain data which cannot be coerced to %s" % (column_name, col_type))
 
+
+
                 else:
 
-                    # All good. Check the length
-                    # NOTE: variable length arrays are not supported
-                    line_length = len(test_value)
-                    format = '%i%s' % (line_length, _NUMPY_TO_FITS_CODE[col_type])
+                    # see if it is a string array
+
+                    if (test_value.dtype.type == np.string_):
+
+                        max_string_length = max(column_data, key=len).dtype.itemsize
+
+
+                        format = '%iA' % max_string_length
+
+                    else:
+
+                        # All good. Check the length
+                        # NOTE: variable length arrays are not supported
+                        line_length = len(test_value)
+                        format = '%i%s' % (line_length, _NUMPY_TO_FITS_CODE[col_type])
 
             else:
 
@@ -177,6 +203,10 @@ class FITSExtension(object):
         # Create the extension
 
         self._hdu = fits.BinTableHDU.from_columns(fits.ColDefs(fits_columns), header=header)
+
+        # update the header to indicate that the file was created by 3ML
+        self._hdu.header.set('CREATOR', "3ML v.%s" % (pkg_resources.get_distribution("threeML").version),
+             "(G.Vianello, giacomov@slac.stanford.edu)")
 
     @property
     def hdu(self):
