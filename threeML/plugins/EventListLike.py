@@ -169,8 +169,8 @@ class EventListLike(OGIPLike):
                               rsp_file=self._rsp_file,
                               verbose=self._verbose)
 
-        self._tstart = min(self._evt_list.tmin_list)
-        self._tstop = max(self._evt_list.tmax_list)
+        self._min_interval_time = min(self._evt_list.tmin_list)
+        self._max_interval_time = max(self._evt_list.tmax_list)
 
         return_ogip = False
 

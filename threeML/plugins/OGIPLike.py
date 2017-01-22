@@ -83,7 +83,7 @@ class OGIPLike(PluginPrototype):
 
             # Assume a fully formed OGIPResponse class
 
-            assert isinstance(rsp_file, InstrumentResponse), "The rsp is not a valid 3ML response"
+            #assert isinstance(rsp_file, InstrumentResponse), "The rsp is not a valid 3ML response"
             self._rsp = rsp_file
 
         # Make sure that data and background have the same number of channels

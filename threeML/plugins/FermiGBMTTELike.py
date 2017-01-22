@@ -10,7 +10,7 @@ from threeML.io.plugin_plots import binned_light_curve_plot
 from threeML.io.rich_display import display
 from threeML.plugins.EventListLike import EventListLike
 from threeML.plugins.OGIP.eventlist import EventListWithDeadTime
-from threeML.plugins.OGIP.response import InstrumentResponseSet
+from threeML.plugins.OGIP.response import InstrumentResponseSet, InstrumentResponse
 from threeML.utils.fermi_relative_mission_time import compute_fermi_relative_mission_times
 
 __instrument_name = "Fermi GBM TTE (all detectors)"
@@ -79,23 +79,33 @@ class FermiGBMTTELike(EventListLike):
                 verbose=verbose)
 
 
+        # we may have a balrog DRM
+
+        if isinstance(rsp_file, str):
+
         # we need to see if this is an RSP2
 
-        test = re.match('^.*\.rsp2$',rsp_file)
+            test = re.match('^.*\.rsp2$',rsp_file)
 
-        if test is not None:
+            if test is not None:
 
-            self._rsp_is_weighted = True
+                self._rsp_is_weighted = True
 
-            self._rsp_set = InstrumentResponseSet.from_rsp2_file(rsp2_file=rsp_file,
-                                                                 counts_getter=event_list.counts_over_interval,
-                                                                 exposure_getter=event_list.exposure_over_interval,
-                                                                 reference_time=self._gbm_tte_file.trigger_time)
+                self._rsp_set = InstrumentResponseSet.from_rsp2_file(rsp2_file=rsp_file,
+                                                                     counts_getter=event_list.counts_over_interval,
+                                                                     exposure_getter=event_list.exposure_over_interval,
+                                                                     reference_time=self._gbm_tte_file.trigger_time)
 
-            rsp_file = self._rsp_set.weight_by_counts(*[interval.replace(' ', '')
-                                                  for interval in source_intervals.split(',')])
+                rsp_file = self._rsp_set.weight_by_counts(*[interval.replace(' ', '')
+                                                      for interval in source_intervals.split(',')])
 
+            else:
+
+                self._rsp_is_weighted = False
         else:
+
+            # assume a fully built response
+            #assert isinstance(rsp_file, InstrumentResponse), "The response is not a valid 3ML response"
 
             self._rsp_is_weighted = False
 
