@@ -17,7 +17,7 @@ from threeML.plugins.OGIP.likelihood_functions import poisson_log_likelihood_ide
 from threeML.plugins.OGIP.likelihood_functions import poisson_observed_gaussian_background
 from threeML.plugins.OGIP.likelihood_functions import poisson_observed_poisson_background
 from threeML.plugins.OGIP.pha import PHA
-from threeML.plugins.OGIP.response import OGIPResponse
+from threeML.plugins.OGIP.response import OGIPResponse, InstrumentResponse
 from threeML.utils.binner import Rebinner
 from threeML.plugins.OGIP.pha import PHAContainer, PHAWrite
 from threeML.config.config import threeML_config
@@ -82,6 +82,8 @@ class OGIPLike(PluginPrototype):
         else:
 
             # Assume a fully formed OGIPResponse class
+
+            assert isinstance(rsp_file, InstrumentResponse), "The rsp is not a valid 3ML response"
             self._rsp = rsp_file
 
         # Make sure that data and background have the same number of channels
