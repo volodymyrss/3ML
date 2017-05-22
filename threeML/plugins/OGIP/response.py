@@ -304,7 +304,6 @@ class InstrumentResponse(object):
 
 
 
-
 class OGIPResponse(InstrumentResponse):
 
     def __init__(self, rsp_file, arf_file=None):
@@ -337,44 +336,16 @@ class OGIPResponse(InstrumentResponse):
 
         self._rsp_file = rsp_file
 
-        # Read the response
-        with pyfits.open(rsp_file) as f:
+        matrix_extension, ebounds_extension = self.read_ogip_response_extensions()
 
-            try:
-
-                # This is usually when the response file contains only the energy dispersion
-
-                data = f['MATRIX', rsp_number].data
-                header = f['MATRIX', rsp_number].header
-
-                if arf_file is None:
-                    warnings.warn("The response is in an extension called MATRIX, which usually means you also "
-                                  "need an ancillary file (ARF) which you didn't provide. You should refer to the "
-                                  "documentation  of the instrument and make sure you don't need an ARF.")
-
-            except:
-
-                # Other detectors might use the SPECRESP MATRIX name instead, usually when the response has been
-                # already convoluted with the effective area
-
-                # Note that here we are not catching any exception, because
-                # we have to fail if we cannot read the matrix
-
-                data = f['SPECRESP MATRIX', rsp_number].data
-                header = f['SPECRESP MATRIX', rsp_number].header
-
-            # These 3 operations must be executed when the file is still open
-
-            matrix = self._read_matrix(data, header)
-
-            ebounds = self._read_ebounds(f['EBOUNDS'])
-
-            mc_channels = self._read_mc_channels(data)
+        matrix = self._read_matrix(matrix_extension.data, matrix_extension.header)
+        ebounds = self._read_ebounds(ebounds_extension)
+        mc_channels = self._read_mc_channels(matrix_extension.data)
 
         # Now, if there is information on the coverage interval, let's use it
 
-        header_start = header.get("TSTART", None)
-        header_stop = header.get("TSTOP", None)
+        header_start = matrix_extension.header.get("TSTART", None)
+        header_stop = matrix_extension.header.get("TSTOP", None)
 
         if header_start is not None and header_stop is not None:
 
@@ -399,6 +370,27 @@ class OGIPResponse(InstrumentResponse):
         else:
 
             self._arf_file = None
+
+    def read_ogip_response_extensions(self,rsp_number):
+        with pyfits.open(self.rsp_file) as f:
+
+            try:
+                return f['MATRIX', rsp_number], f['EBOUNDS', rsp_number]
+            except Exception as e:
+                print e
+            
+            try:
+                return f['SPECRESP MATRIX', rsp_number], f['EBOUNDS', rsp_number]
+            except Exception as e:
+                print e
+                
+            try:
+                return f['SPI.-RMF.-RSP', rsp_number], f['SPI.-EBDS-SET', rsp_number]
+            except Exception as e:
+                print e
+
+            raise Exception("no response could be found!")
+
 
     @staticmethod
     def _are_contiguous(arr1, arr2):
