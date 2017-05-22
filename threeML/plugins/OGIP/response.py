@@ -336,11 +336,12 @@ class OGIPResponse(InstrumentResponse):
 
         self._rsp_file = rsp_file
 
-        matrix_extension, ebounds_extension = self.read_ogip_response_extensions()
+        with pyfits.open(self._rsp_file) as f:
+            matrix_extension, ebounds_extension = self.read_ogip_response_extensions(f,rsp_number)
 
-        matrix = self._read_matrix(matrix_extension.data, matrix_extension.header)
-        ebounds = self._read_ebounds(ebounds_extension)
-        mc_channels = self._read_mc_channels(matrix_extension.data)
+            matrix = self._read_matrix(matrix_extension.data, matrix_extension.header)
+            ebounds = self._read_ebounds(ebounds_extension)
+            mc_channels = self._read_mc_channels(matrix_extension.data)
 
         # Now, if there is information on the coverage interval, let's use it
 
@@ -371,25 +372,23 @@ class OGIPResponse(InstrumentResponse):
 
             self._arf_file = None
 
-    def read_ogip_response_extensions(self,rsp_number):
-        with pyfits.open(self.rsp_file) as f:
-
-            try:
-                return f['MATRIX', rsp_number], f['EBOUNDS', rsp_number]
-            except Exception as e:
-                print e
+    def read_ogip_response_extensions(self,f,rsp_number):
+        try:
+            return f['MATRIX', rsp_number], f['EBOUNDS', rsp_number]
+        except Exception as e:
+            print e
+        
+        try:
+            return f['SPECRESP MATRIX', rsp_number], f['EBOUNDS', rsp_number]
+        except Exception as e:
+            print e
             
-            try:
-                return f['SPECRESP MATRIX', rsp_number], f['EBOUNDS', rsp_number]
-            except Exception as e:
-                print e
-                
-            try:
-                return f['SPI.-RMF.-RSP', rsp_number], f['SPI.-EBDS-SET', rsp_number]
-            except Exception as e:
-                print e
+        try:
+            return f['SPI.-RMF.-RSP', rsp_number], f['SPI.-EBDS-SET', rsp_number]
+        except Exception as e:
+            print e
 
-            raise Exception("no response could be found!")
+        raise Exception("no response could be found!")
 
 
     @staticmethod
