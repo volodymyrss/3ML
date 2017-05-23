@@ -92,7 +92,7 @@ def test_loading_a_generic_pha_file():
 
 def test_loading_a_loose_ogip_pha_file():
     with within_directory(__this_dir__):
-        ogip = OGIPLike('test_ogip', observation='example_integral.pha')
+        ogip = OGIPLike('test_ogip', observation='example_integral.pha',response='example_integral.rsp')
 
         pha_info = ogip.get_pha_files()
 
@@ -110,7 +110,6 @@ def test_loading_a_loose_ogip_pha_file():
         assert 'rsp' in pha_info
 
         ogip.__repr__()
-
 
 def test_pha_files_in_generic_ogip_constructor_spec_number_in_file_name():
     with within_directory(__this_dir__):
