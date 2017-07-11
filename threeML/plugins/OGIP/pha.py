@@ -110,6 +110,8 @@ class PHAWrite(object):
         first_channel = pha_info['rsp'].first_channel
 
         for key in ['pha', 'bak']:
+            if pha_info[key] is None:
+                continue
 
             if key == 'pha':
 
@@ -230,17 +232,19 @@ class PHAWrite(object):
         # number of channels
 
 
-        assert len(self._rate['pha'][0]) == len(
-                self._rate['bak'][0]), "PHA and BAK files do not have the same number of channels. Something is wrong."
+        if len(self._rate['bak'])>0:
+            assert len(self._rate['pha'][0]) == len(
+                    self._rate['bak'][0]), "PHA and BAK files do not have the same number of channels. Something is wrong."
 
-        assert self._instrument['pha'] == self._instrument[
-            'bak'], "Instrument for PHA and BAK (%s,%s) are not the same. Something is wrong with the files. " % (
-            self._instrument['pha'], self._instrument['bak'])
+            assert self._instrument['pha'] == self._instrument[
+                'bak'], "Instrument for PHA and BAK (%s,%s) are not the same. Something is wrong with the files. " % (
+                self._instrument['pha'], self._instrument['bak'])
 
-        assert self._mission['pha'] == self._mission[
-            'bak'], "Mission for PHA and BAK (%s,%s) are not the same. Something is wrong with the files. " % (
-            self._mission['pha'], self._mission['bak'])
-
+            assert self._mission['pha'] == self._mission[
+                'bak'], "Mission for PHA and BAK (%s,%s) are not the same. Something is wrong with the files. " % (
+                self._mission['pha'], self._mission['bak'])
+        else:
+            self._write_bak_file = False
 
 
         if self._write_bak_file:
