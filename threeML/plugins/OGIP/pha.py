@@ -80,6 +80,7 @@ class PHAWrite(object):
 
         self._outfile_basename = outfile_name
 
+
         self._outfile_name = {'pha': '%s.pha' % outfile_name, 'bak': '%s_bak.pha' % outfile_name}
 
         self._out_rsp = []
@@ -87,8 +88,6 @@ class PHAWrite(object):
         for ogip in self._ogiplike:
 
             self._append_ogip(ogip, force_rsp_write)
-
-
 
 
         self._write_phaII(overwrite)
@@ -106,14 +105,12 @@ class PHAWrite(object):
         pha_info = ogip.get_pha_files()
 
 
-
         first_channel = pha_info['rsp'].first_channel
 
         for key in ['pha', 'bak']:
-            if pha_info[key] is None:
-                continue
+            if key not in pha_info: continue
 
-            if key == 'pha':
+            if key == 'pha' and 'bak' in pha_info:
 
                 if pha_info[key].background_file is not None:
 
@@ -228,11 +225,10 @@ class PHAWrite(object):
         # Fix this later... if needed.
         trigger_time = None
 
-        # Assuming background and pha files have the same
-        # number of channels
+        if self._backfile['pha'] is not None:
+            # Assuming background and pha files have the same
+            # number of channels
 
-
-        if len(self._rate['bak'])>0:
             assert len(self._rate['pha'][0]) == len(
                     self._rate['bak'][0]), "PHA and BAK files do not have the same number of channels. Something is wrong."
 
