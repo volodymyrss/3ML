@@ -572,9 +572,6 @@ class PHAII(FITSFile):
                         break
 
 
-
-
-
             spectrum = FITSExtension.from_fits_file_extension(spectrum_extension)
 
             out = FITSFile(primary_hdu=f['PRIMARY'], fits_extensions=[spectrum])
