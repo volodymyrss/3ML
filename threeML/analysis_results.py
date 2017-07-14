@@ -863,7 +863,7 @@ class BayesianResults(_AnalysisResults):
 
 
         if not has_chainconsumer:
-            RuntimeError("You must have chainconsumer installed to use this function: pip install chainconsumer")
+            raise RuntimeError("You must have chainconsumer installed to use this function: pip install chainconsumer")
 
         # these are the keywords for the plot command
 

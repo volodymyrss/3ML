@@ -678,7 +678,8 @@ class PHASpectrum(BinnedSpectrumWithDispersion):
 
 
         assert isinstance(pha_file_or_instance, str) or isinstance(pha_file_or_instance,
-                                                                   PHAII), 'Must provide a FITS file name or PHAII instance'
+                                                                   PHAII), \
+            'Must provide a FITS file name or PHAII instance, got %s instead'%repr(pha_file_or_instance)
 
         pha_information = _read_pha_or_pha2_file(pha_file_or_instance,
                                                  spectrum_number,
