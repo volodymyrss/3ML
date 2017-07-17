@@ -1003,7 +1003,8 @@ class SpectrumLike(PluginPrototype):
                           self._current_observed_count_errors,
                           model_counts)
 
-        assert np.all(np.isfinite(chi2_))
+        assert np.all(np.isfinite(chi2_)),"chi2 is inifinite, observed: %s, errors: %s, model: %s"%\
+                                          (self._current_observed_counts,self._current_observed_count_errors,model_counts)
 
         return np.sum(chi2_) * (-1)
 

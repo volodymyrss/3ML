@@ -364,7 +364,7 @@ def display_spectrum_model_counts(analysis, data=(), **kwargs):
                                residual_yerr=residual_errors,
                                yerr=new_err / new_chan_width,
                                xerr=delta_energy,
-                               label=data._name,
+                               label=data._name.replace("_","\\_"),
                                color=data_color)
 
         if step:
@@ -373,8 +373,8 @@ def display_spectrum_model_counts(analysis, data=(), **kwargs):
                                          new_energy_max,
                                          new_chan_width,
                                          new_model_rate,
-                                         label='%s Model' % data._name,
-                                         color=model_color)
+                                         label=None,
+                                         color=data_color)
 
 
         else:
@@ -389,8 +389,8 @@ def display_spectrum_model_counts(analysis, data=(), **kwargs):
 
             residual_plot.add_model(x,
                                     y,
-                                    label='%s Model' % data._name,
-                                    color=model_color)
+                                    label=None,
+                                    color=data_color)
 
     return residual_plot.finalize(xlabel="Energy\n(keV)",
                                   ylabel="Net rate\n(counts s$^{-1}$ keV$^{-1}$)",
@@ -771,13 +771,13 @@ def display_photometry_model_magnitudes(analysis, data=(), **kwargs):
                                xerr=widths,
                                yerr=mag_errors,
                                residuals=residuals,
-                               label=data._name,
+                               label=data._name.replace("_","\\_"),
                                color=data_color)
 
         residual_plot.add_model(avg_wave_length,
                                 expected_model_magnitudes,
-                                label='%s Model' % data._name,
-                                color=model_color)
+                                label=None,
+                                color=data_color)
 
 
 

@@ -144,7 +144,11 @@ class OGIPLike(DispersionSpectrumLike):
 
         pha_files = dispersion_like.get_pha_files()
         observed = pha_files['pha']
-        background = pha_files['bak']
+
+        if 'bak' in pha_files:
+            background = pha_files['bak']
+        else:
+            background=None
 
         observed_pha = PHASpectrum.from_dispersion_spectrum(observed, file_type='observed')
 
