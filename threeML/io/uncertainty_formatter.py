@@ -55,6 +55,9 @@ def uncertainty_formatter(value, low_bound, hi_bound):
 
     order_of_magnitude = max([_order_of_magnitude(value), _order_of_magnitude(error_m), _order_of_magnitude(error_p)])
 
+    if abs(np.log10(order_of_magnitude))<3:
+        order_of_magnitude=1
+
     scaled_value = value / order_of_magnitude
     scaled_error_m = error_m / order_of_magnitude
     scaled_error_p = error_p / order_of_magnitude

@@ -98,6 +98,8 @@ class JointLikelihood(object):
 
         self._current_minimum = None
 
+        self.minus_log_like_best_so_far = None
+
         # Null setup for minimizer
 
         self._minimizer = None
@@ -724,9 +726,19 @@ class JointLikelihood(object):
             return minimization.FIT_FAILED
 
         if self.verbose:
-            print("Trying with parameters %s, resulting in logL = %s" % (trial_values, summed_log_likelihood))
+            if self.verbose == "chatty":
+
+                if self.minus_log_like_best_so_far is None \
+                        or self.ncalls%100==0 \
+                        or (abs(summed_log_likelihood)<abs(self.minus_log_like_best_so_far)-10 and self.ncalls%10==0):
+                    print("%i parameters %s, resulting in logL = %s" % (self.ncalls, trial_values, summed_log_likelihood))
+            else:
+                print("Trying with parameters %s, resulting in logL = %s" % (trial_values, summed_log_likelihood))
 
         # Return the minus log likelihood
+
+        if self.minus_log_like_best_so_far is None or (-1*summed_log_likelihood)<self.minus_log_like_best_so_far:
+            self.minus_log_like_best_so_far=-1*summed_log_likelihood
 
         return summed_log_likelihood * (-1)
 
