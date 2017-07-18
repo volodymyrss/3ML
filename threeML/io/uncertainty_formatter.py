@@ -88,7 +88,14 @@ def uncertainty_formatter(value, low_bound, hi_bound):
 
     # Get the exponent of 10 to use for the representation
 
-    expon = int(np.log10(order_of_magnitude))
+    if order_of_magnitude<=0:
+        print("warning: exponent overflow")
+
+    try:
+        expon = int(np.log10(order_of_magnitude))
+    except OverflowError:
+        print("warning: exponent overflow for %.5lg"%order_of_magnitude)
+        expon = 0
 
     if unc1 != unc2:
 
